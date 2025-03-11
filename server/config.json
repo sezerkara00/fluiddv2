@@ -1,0 +1,19 @@
+{
+  "blacklist": [
+    "fluidd.xyz",
+    "fluidd.net"
+  ],
+  "endpoints": [
+  ],
+  "hosted": false,
+  "themePresets": [
+    {
+      "name": "Layerstec/M1pro",
+      "color": "#252525",
+      "isDark": true,
+      "logo": {
+        "src": "logo_sezer.svg"
+      }
+    }
+  ]
+}
