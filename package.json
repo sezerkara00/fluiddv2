@@ -1,9 +1,9 @@
 {
-  "name": "fluidd",
+  "name": "C2P-WEBAPP",
   "version": "1.32.3",
   "private": true,
   "type": "module",
-  "description": "fluidd, a klipper web client.",
+  "description": "C2P-WEBAPP, a C2P webapp.",
   "author": {
     "name": "Craig Bassett"
   },

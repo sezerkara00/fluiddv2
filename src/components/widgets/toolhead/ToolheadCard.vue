@@ -309,24 +309,24 @@ export default class ToolheadCard extends Mixins(StateMixin, ToolheadMixin) {
       })
     }
 
-    tools.push({
-      name: 'MANUAL_PROBE',
-      disabled: !this.allHomed || this.isManualProbeActive,
-      wait: this.$waits.onManualProbe
-    })
+    // tools.push({
+    //   name: 'MANUAL_PROBE',
+    //   disabled: !this.allHomed || this.isManualProbeActive,
+    //   wait: this.$waits.onManualProbe
+    // })
 
-    if (this.printerSupportsProbeCalibrate) {
-      tools.push({
-        name: 'PROBE_ACCURACY',
-        disabled: !this.allHomed,
-        wait: this.$waits.onProbeAccuracy
-      })
-      tools.push({
-        name: 'PROBE_CALIBRATE',
-        disabled: !this.allHomed,
-        wait: this.$waits.onProbeCalibrate
-      })
-    }
+    // if (this.printerSupportsProbeCalibrate) {
+    //   tools.push({
+    //     name: 'PROBE_ACCURACY',
+    //     disabled: !this.allHomed,
+    //     wait: this.$waits.onProbeAccuracy
+    //   })
+    //   tools.push({
+    //     name: 'PROBE_CALIBRATE',
+    //     disabled: !this.allHomed,
+    //     wait: this.$waits.onProbeCalibrate
+    //   })
+    // }
 
     if (this.printerSupportsQuadGantryLevel) {
       tools.push({

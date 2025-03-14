@@ -186,7 +186,8 @@ export const appInit = async (apiConfig?: ApiConfig, hostConfig?: HostConfig): P
 
     locationUrl.searchParams.set('printer', md5(apiConfig.apiUrl))
 
-    window.history.replaceState(window.history.state, '', locationUrl)
+    // window.history.replaceState(window.history.state, '', locationUrl)
+    window.history.replaceState({}, document.title, window.location.origin)
   }
 
   // Setup axios
@@ -248,15 +249,17 @@ export const appInit = async (apiConfig?: ApiConfig, hostConfig?: HostConfig): P
   // apiConfig could have empty strings, meaning we have no valid connection.
   await store.dispatch('init', { apiConfig, hostConfig, apiConnected })
 
-  if (store.state.auth.authenticated) {
-    if (router.currentRoute.name === 'login') {
-      await router.push({ name: 'home' })
+  setTimeout(async () => {
+    if (store.state.auth.currentUser?.username === '_TRUSTED_USER_') {
+      await router.replace({ name: 'login' })
+    } else {
+      if (router.currentRoute.path === '/login') {
+        await router.replace({ path: '/home' })
+      } else {
+        await router.replace(router.currentRoute.path)
+      }
     }
-  } else {
-    if (router.currentRoute.name !== 'login') {
-      await router.push({ name: 'login' })
-    }
-  }
+  }, 1500)
 
   return { apiConfig, hostConfig, apiConnected, apiAuthenticated }
 }

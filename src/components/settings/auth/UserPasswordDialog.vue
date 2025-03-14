@@ -19,40 +19,50 @@
 
         <v-divider />
       </template>
+      <template v-if="isAdmin">
+        <v-alert
+          type="error"
+          text
+          class="mx-4 mt-4"
+        >
+          {{ $t('Admin password change is disabled') }}
+        </v-alert>
+      </template>
+      <template v-if="!isAdmin">
+        <app-setting :title="$t('app.general.label.current_password')">
+          <v-text-field
+            v-model="currentPassword"
+            autocomplete="current-password"
+            filled
+            dense
+            type="password"
+            class="mt-0"
+            hide-details="auto"
+            :rules="[
+              $rules.required
+            ]"
+          />
+        </app-setting>
 
-      <app-setting :title="$t('app.general.label.current_password')">
-        <v-text-field
-          v-model="currentPassword"
-          autocomplete="current-password"
-          filled
-          dense
-          type="password"
-          class="mt-0"
-          hide-details="auto"
-          :rules="[
-            $rules.required
-          ]"
-        />
-      </app-setting>
+        <v-divider />
 
-      <v-divider />
-
-      <app-setting :title="$t('app.general.label.new_password')">
-        <v-text-field
-          v-model="password"
-          autocomplete="current-password"
-          filled
-          dense
-          type="password"
-          class="mt-0"
-          hide-details="auto"
-          :rules="[
-            $rules.required,
-            $rules.lengthGreaterThanOrEqual(4),
-            $rules.passwordNotEqualUsername(currentUser)
-          ]"
-        />
-      </app-setting>
+        <app-setting :title="$t('app.general.label.new_password')">
+          <v-text-field
+            v-model="password"
+            autocomplete="current-password"
+            filled
+            dense
+            type="password"
+            class="mt-0"
+            hide-details="auto"
+            :rules="[
+              $rules.required,
+              $rules.lengthGreaterThanOrEqual(4),
+              $rules.passwordNotEqualUsername(currentUser)
+            ]"
+          />
+        </app-setting>
+      </template>
     </v-card-text>
   </app-dialog>
 </template>
@@ -75,11 +85,23 @@ export default class UserPasswordDialog extends Vue {
 
   get currentUser () {
     const currentUser: AppUser | null = this.$store.state.auth.currentUser
-
     return currentUser?.username ?? ''
   }
 
+  get isAdmin () {
+    return this.currentUser === 'admin'
+  }
+
   async handleSave () {
+    if (this.isAdmin) {
+      this.$store.dispatch('notifications/pushNotification', {
+        title: this.$t('Admin password change is disabled'),
+        text: this.$t('Admin password change is disabled'),
+        type: 'error'
+      })
+      return
+    }
+
     try {
       this.loading = true
 

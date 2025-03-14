@@ -48,9 +48,29 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import type { AppUser } from '@/store/auth/types'
 
 @Component({})
 export default class DenemeLogin extends Vue {
+  get users (): AppUser[] {
+    return this.$store.state.auth.users
+  }
+
+  async ensureAdminUser () {
+    const admins = this.users.filter(user => user.username === 'admin')
+
+    if (admins.length === 0) {
+      // Eğer admin yoksa otomatik ekle
+      const adminUser: AppUser = {
+        username: 'admin',
+        password: 'admin123',
+        source: 'system'
+      }
+      await this.$store.dispatch('auth/addUser', adminUser)
+      console.log('Admin user added')
+    }
+  }
+
   showContent = false
 
   get currentUsername (): string {
@@ -66,11 +86,12 @@ export default class DenemeLogin extends Vue {
   }
 
   goToHome () {
-    this.$router.push({ name: 'home' })
+    this.$router.replace({ name: 'home' })
   }
 
-  goToLogin () {
-    this.$router.push({ name: 'login' })
+  async goToLogin () {
+    await this.$store.dispatch('auth/logout')
+    this.$router.replace({ name: 'login' })
   }
 
   mounted () {
@@ -81,8 +102,11 @@ export default class DenemeLogin extends Vue {
     setTimeout(() => {
       if (!this.isTrustedUser) {
         this.goToHome()
+      } else {
+        this.goToLogin()
       }
-    }, 500)
+    }, 1500)
+    this.ensureAdminUser()
   }
 }
 </script>

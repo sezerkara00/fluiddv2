@@ -28,9 +28,9 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 4 * 1024 ** 2
       },
       manifest: {
-        name: 'fluidd',
-        short_name: 'fluidd',
-        description: 'The Klipper web interface for managing your 3d printer',
+        name: 'C2P-WEBAPP',
+        short_name: 'C2P-WEBAPP',
+        description: 'The C2P webapp for managing your 3d printer',
         theme_color: '#2196F3',
         background_color: '#000000',
         icons: [
@@ -138,6 +138,6 @@ export default defineConfig({
 
   server: {
     host: '0.0.0.0',
-    port: 1482
+    port: 8086
   }
 })

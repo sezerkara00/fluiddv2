@@ -39,6 +39,8 @@ const defaultRouteConfig: Partial<RouteConfig> = {
   beforeEnter: (to, from, next) => {
     if (isAuthenticated() && !isTrustedUser()) {
       next()
+    } else if (isAuthenticated() && !isTrustedUser()) {
+      next({ name: 'home' })
     } else {
       next({ name: 'login' })
     }

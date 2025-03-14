@@ -70,7 +70,7 @@ export const getters: GetterTree<LayoutState, RootState> = {
     const user: AppUser | null = rootState.auth.currentUser
 
     if (!user || user.username === '_TRUSTED_USER_') return 'login'
-
+    console.log('user', user)
     const size = vuetify.framework.breakpoint.name
     return `dashboard-${size}-${user.username}`
   }

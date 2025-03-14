@@ -360,11 +360,11 @@ export default class App extends Mixins(StateMixin, FilesMixin, BrowserMixin) {
   }
 
   beforeDestroy () {
-    window.removeEventListener('dragover', this.handleDragOver)
-    window.removeEventListener('dragenter', this.handleDragOver)
-    window.removeEventListener('dragleave', this.handleDragLeave)
-    window.removeEventListener('drop', this.handleDrop)
-    window.removeEventListener('keydown', this.handleKeyDown)
+    // window.removeEventListener('dragover', this.handleDragOver)
+    // window.removeEventListener('dragenter', this.handleDragOver)
+    // window.removeEventListener('dragleave', this.handleDragLeave)
+    // window.removeEventListener('drop', this.handleDrop)
+    // window.removeEventListener('keydown', this.handleKeyDown)
   }
 
   handleToolsDrawerChange () {

@@ -22,8 +22,9 @@ export const defaultState = (): LayoutState => {
           { id: 'outputs-card', enabled: true, collapsed: false },
           { id: 'runout-sensors-card', enabled: false, collapsed: false },
           { id: 'printer-limits-card', enabled: true, collapsed: false },
-          { id: 'retract-card', enabled: true, collapsed: false }
-
+          { id: 'retract-card', enabled: true, collapsed: false },
+          { id: 'Calibre-Card', enabled: true, collapsed: false },
+          { id: 'Ze-Manuel-Card', enabled: true, collapsed: false },
         ],
         container2: [
           { id: 'temperature-card', enabled: true, collapsed: false },
@@ -35,7 +36,7 @@ export const defaultState = (): LayoutState => {
           { id: 'bed-mesh-card', enabled: false, collapsed: false },
           { id: 'beacon-card', enabled: false, collapsed: false },
           { id: 'printer-limit-card', enabled: true, collapsed: false },
-          { id: 'printer-sezer-card', enabled: true, collapsed: false }
+          { id: 'printer-sezer-card', enabled: true, collapsed: false },
         ]
       },
       diagnostics: {

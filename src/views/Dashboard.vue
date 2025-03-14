@@ -1,4 +1,5 @@
 <template>
+
   <v-row :dense="$vuetify.breakpoint.smAndDown">
     <template v-for="(container, containerIndex) in containers">
       <v-col
@@ -63,6 +64,8 @@ import BeaconCard from '@/components/widgets/beacon/BeaconCard.vue'
 import type { KlipperPrinterSettings } from '@/store/printer/types'
 // import PrinterSezerCard from '@/components/widgets/deneme/PrintersezerCard.vue'
 import PrinterLimitCard from '@/components/widgets/denemee/PrinterLimitCard.vue'
+import CalibreCard from '@/components/widgets/calibrasyon/CalibreCard.vue'
+import ZeManuelCard from '@/components/widgets/manuel/ZeManuelCard.vue'
 @Component({
   components: {
     PrinterStatusCard,
@@ -84,6 +87,8 @@ import PrinterLimitCard from '@/components/widgets/denemee/PrinterLimitCard.vue'
     SensorsCard,
     RunoutSensorsCard,
     BeaconCard,
+    CalibreCard,
+    ZeManuelCard
   }
 })
 export default class Dashboard extends Mixins(StateMixin) {
@@ -96,6 +101,7 @@ export default class Dashboard extends Mixins(StateMixin) {
     window.addEventListener('resize', this.updateMenuCollapsed)
 
     this.updateMenuCollapsed()
+    console.log(this.printerSettings)
   }
 
   unmounted () {
@@ -246,7 +252,8 @@ export default class Dashboard extends Mixins(StateMixin) {
     if (item.id === 'spoolman-card' && !this.supportsSpoolman) return true
     if (item.id === 'sensors-card' && !this.hasSensors) return true
     if (item.id === 'temperature-card' && !this.hasHeatersOrTemperatureSensors) return true
-
+    if (item.id === 'calibre-card') return true
+    if (item.id === 'ze-manuel-card') return true
     // Otherwise return the opposite of whatever the enabled state is.
     return !item.enabled
   }

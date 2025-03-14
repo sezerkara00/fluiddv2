@@ -207,7 +207,7 @@ export const actions: ActionTree<AuthState, RootState> = {
     const token = localStorage.getItem(keys['user-token'])
 
     // Clear the token.
-    delete httpClientActions.defaults.headers.common.Authorization
+    // delete httpClientActions.defaults.headers.common.Authorization
 
     try {
       // Make the request.
@@ -221,8 +221,6 @@ export const actions: ActionTree<AuthState, RootState> = {
       // no error, so must be trusted. partial logout.
       dispatch('logout', { partial: true })
       commit('setCurrentUser', user)
-      router.push({ name: 'login' })
-      console.log('user', user)
     } catch {
       // error. not trusted. log'em out.
       dispatch('logout')

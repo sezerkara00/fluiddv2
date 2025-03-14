@@ -17,7 +17,7 @@
             <v-icon>$account</v-icon>
           </app-btn>
         </template>
-        <span>{{ currentUser }}</span>
+        <span>{{ getCurrentUser }}</span>
       </v-tooltip>
     </template>
 
@@ -28,10 +28,10 @@
             $account
           </v-icon>
         </div>
-        <span class="text-h5">{{ currentUser }}</span>
+        <span class="text-h5">{{ getCurrentUser }}</span>
 
         <div
-          v-if="user && !isTrustedOnly"
+          v-if="user && !isTrustedOnly && user.username !== 'Login'"
           class="mt-3"
         >
           <app-btn
@@ -50,6 +50,17 @@
             </small>
           </div>
         </div>
+        <div
+          v-if="user && user.username === '_TRUSTED_USER_'"
+          class="mt-3"
+        >
+          <app-btn
+            small
+            @click="goToLogin"
+          >
+            Go to Login
+          </app-btn>
+        </div>
       </v-card-text>
 
       <v-divider />
@@ -58,7 +69,7 @@
         dense
         class="py-0"
       >
-        <v-list-item @click="$filters.routeTo({ name: 'settings', hash: '#auth' })">
+       <v-list-item @click="$router.push({ name: 'settings', hash: '#auth' })">
           <v-list-item-icon>
             <v-icon>$addAccount</v-icon>
           </v-list-item-icon>
@@ -106,6 +117,10 @@ export default class AppNotificationMenu extends Vue {
     }
   }
 
+  get getCurrentUser () {
+    return this.currentUser === '_TRUSTED_USER_' ? 'Login' : this.currentUser
+  }
+
   get isTrustedOnly () {
     if (!this.user) return false
     return (
@@ -115,7 +130,12 @@ export default class AppNotificationMenu extends Vue {
   }
 
   async handleLogout () {
-    await this.$store.dispatch('auth/checkTrust')
+    await this.$store.dispatch('auth/logout')
+    this.$router.push({ name: 'login' })
+  }
+
+  goToLogin () {
+    this.$router.push({ name: 'login' })
   }
 }
 </script>
