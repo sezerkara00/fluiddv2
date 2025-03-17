@@ -4,18 +4,48 @@
       <v-container>
         <!-- Tool Selection and START button -->
         <v-row align="center" justify="center" class="mb-4">
-          <v-col cols="auto" v-for="tool in tools" :key="tool.value">
+          <!-- Tool Buttons -->
+          <v-col cols="auto">
             <v-btn
               color="primary"
               class="mx-1"
-              @click="selectTool(tool.value)"
+              @click="selectTool('t0')"
             >
-              {{ tool.text }}
+              T0
             </v-btn>
           </v-col>
           <v-col cols="auto">
             <v-btn
-              color="success"
+              color="primary"
+              class="mx-1"
+              @click="selectTool('t1')"
+            >
+              T1
+            </v-btn>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              color="primary"
+              class="mx-1"
+              @click="selectTool('t2')"
+            >
+              T2
+            </v-btn>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              color="primary"
+              class="mx-1"
+              @click="selectTool('t3')"
+            >
+              T3
+            </v-btn>
+          </v-col>
+          
+          <!-- START Button -->
+          <v-col cols="auto">
+            <v-btn
+              color="grey"
               class="mx-1"
               @click="handleStart"
             >
@@ -32,6 +62,20 @@
         >
           <v-card>
             <v-card-text>
+              <!-- Tool Selection Buttons -->
+              <v-row justify="center" class="mb-4">
+                <v-col cols="auto" v-for="tool in tools" :key="tool.value">
+                  <v-btn
+                    small
+                    :color="selectedTool === tool.value ? 'primary' : 'grey darken-1'"
+                    class="mx-1"
+                    @click="switchTool(tool.value)"
+                  >
+                    {{ tool.text }}
+                  </v-btn>
+                </v-col>
+              </v-row>
+
               <!-- Z Title with Value and Selected Tool -->
               <v-row justify="center" class="mb-4">
                 <v-col cols="12" class="text-center">
@@ -41,70 +85,38 @@
                 </v-col>
               </v-row>
 
-              <!-- First Row of +/- Controls -->
-              <v-row align="center" justify="center" class="mb-2">
-                <v-col cols="auto">
-                  <v-btn  color="error" x-small @click="decrease(1)">
-                    -
-                  </v-btn>
-                </v-col>
-                <v-col cols="auto" class="text-center">
-                  <span class="mx-4">1</span>
-                </v-col>
-                <v-col cols="auto">
-                  <v-btn color="success" x-small @click="increase(1)">
-                    +
-                  </v-btn>
-                </v-col>
-              </v-row>
-
-              <!-- Second Row of +/- Controls -->
-              <v-row align="center" justify="center" class="mb-6">
-                <v-col cols="auto">
-                  <v-btn color="error" x-small @click="decrease(2)">
-                    -
-                  </v-btn>
-                </v-col>
-                <v-col cols="auto" class="text-center">
-                  <span class="mx-4">2</span>
-                </v-col>
-                <v-col cols="auto">
-                  <v-btn color="success" x-small @click="increase(2)">
-                    +
-                  </v-btn>
-                </v-col>
-              </v-row>
-              <v-row align="center" justify="center" class="mb-6">
-                <v-col cols="auto">
-                  <v-btn color="error" x-small @click="decrease(3)">
-                    -
-                  </v-btn>
-                </v-col>
-                <v-col cols="auto" class="text-center">
-                  <span class="mx-4">3</span>
-                </v-col>
-                <v-col cols="auto">
-                  <v-btn color="success" x-small @click="increase(3)">
-                    +
-                  </v-btn>
-                </v-col>
-              </v-row>
+              <!-- Z Control Rows -->
+              <template v-for="(row, index) in zControlRows">
+                <v-row :key="index" align="center" justify="center" :class="index < 2 ? 'mb-2' : 'mb-6'">
+                  <v-col cols="auto">
+                    <v-btn  
+                      :color="getButtonColor(row.row, 'minus')" 
+                      x-small 
+                      @click="decrease(row.row)"
+                    >
+                      -
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="auto" class="text-center">
+                    <span class="mx-4">{{ row.row }}</span>
+                  </v-col>
+                  <v-col cols="auto">
+                    <v-btn 
+                      :color="getButtonColor(row.row, 'plus')" 
+                      x-small 
+                      @click="increase(row.row)"
+                    >
+                      +
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </template>
 
               <!-- Bottom Buttons -->
               <v-row justify="space-around" class="mt-4">
-                <v-col cols="auto">
-                  <v-btn color="primary" @click="handleButton(1)">
-                    Abort
-                  </v-btn>
-                </v-col>
-                <v-col cols="auto">
-                  <v-btn color="primary" @click="handleButton(2)">
-                    Offset
-                  </v-btn>
-                </v-col>
-                <v-col cols="auto">
-                  <v-btn color="primary" @click="handleButton(3)">
-                    Static
+                <v-col cols="auto" v-for="(btn, index) in bottomButtons" :key="index">
+                  <v-btn :color="btn.color" @click="handleButton(btn.action)">
+                    {{ btn.text }}
                   </v-btn>
                 </v-col>
               </v-row>
@@ -129,17 +141,45 @@ interface Tool {
   defaultValue: number
 }
 
+interface Button {
+  text: string
+  color: string
+  action: number
+}
+
 @Component({})
 export default class ZeManuel extends Vue {
   toolSelected = false
   selectedTool = ''
   zValue = 10.000
 
-  // Computed property to get selected tool text
-  get selectedToolText(): string {
-    const tool = this.tools.find(t => t.value === this.selectedTool)
-    return tool ? tool.text : ''
+  // Renk konfigürasyonu
+  buttonColors = {
+    minus: 'grey darken-1',
+    plus: 'grey darken-1',
+    default: 'primary',
+    active: 'primary'  // Butona basıldığında primary renk olacak
   }
+
+  // Aktif buton takibi için
+  activeButton: { row: number; type: 'plus' | 'minus' } | null = null
+
+  // Z kontrol satırları konfigürasyonu
+  zControlRows = [
+    { row: 1, increment: 0.100, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
+    { row: 2, increment: 0.010, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
+    { row: 3, increment: 0.001, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
+    { row: 4, increment: 1, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
+    { row: 5, increment: 10, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
+    { row: 6, increment: 100, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } }
+  ]
+
+  // Alt butonlar için konfigürasyon
+  bottomButtons: Button[] = [
+    { text: 'Abort', color: this.buttonColors.default, action: 1 },
+    { text: 'Offset', color: this.buttonColors.default, action: 2 },
+    { text: 'Static', color: this.buttonColors.default, action: 3 }
+  ]
 
   tools: Tool[] = [
     { text: 'T0', value: 't0', defaultValue: 10.000 },
@@ -147,6 +187,12 @@ export default class ZeManuel extends Vue {
     { text: 'T2', value: 't2', defaultValue: 12.000 },
     { text: 'T3', value: 't3', defaultValue: 13.000 }
   ]
+
+  // Computed property to get selected tool text
+  get selectedToolText(): string {
+    const tool = this.tools.find(t => t.value === this.selectedTool)
+    return tool ? tool.text : ''
+  }
 
   // Load saved values from localStorage when component is created
   created() {
@@ -178,25 +224,45 @@ export default class ZeManuel extends Vue {
   }
 
   decrease(row: number) {
-    if (row === 1) {
-      this.zValue -= 0.100
-    } else if (row === 2) {
-      this.zValue -= 0.010
-    } else if (row === 3) {
-      this.zValue -= 0.001
+    const rowConfig = this.zControlRows.find(r => r.row === row)
+    if (rowConfig) {
+      // Butonu aktif yap
+      this.activeButton = { row, type: 'minus' }
+      
+      // Değeri güncelle
+      this.zValue -= rowConfig.increment
+      this.zValue = Number(this.zValue.toFixed(3))
+
+      // 100ms sonra butonu normale döndür
+      setTimeout(() => {
+        this.activeButton = null
+      }, 100)
     }
-    this.zValue = Number(this.zValue.toFixed(3))
   }
 
   increase(row: number) {
-    if (row === 1) {
-      this.zValue += 0.100
-    } else if (row === 2) {
-      this.zValue += 0.010
-    } else if (row === 3) {
-      this.zValue += 0.001
+    const rowConfig = this.zControlRows.find(r => r.row === row)
+    if (rowConfig) {
+      // Butonu aktif yap
+      this.activeButton = { row, type: 'plus' }
+      
+      // Değeri güncelle
+      this.zValue += rowConfig.increment
+      this.zValue = Number(this.zValue.toFixed(3))
+
+      // 100ms sonra butonu normale döndür
+      setTimeout(() => {
+        this.activeButton = null
+      }, 100)
     }
-    this.zValue = Number(this.zValue.toFixed(3))
+  }
+
+  // Buton rengini hesaplamak için computed method
+  getButtonColor(row: number, type: 'plus' | 'minus'): string {
+    if (this.activeButton && this.activeButton.row === row && this.activeButton.type === type) {
+      return this.buttonColors.active
+    }
+    return type === 'plus' ? this.buttonColors.plus : this.buttonColors.minus
   }
 
   handleButton(buttonNumber: number) {
@@ -234,44 +300,22 @@ export default class ZeManuel extends Vue {
       }
     }
   }
+
+  switchTool(toolValue: string) {
+    // Mevcut Z değerini kaydet
+    const currentTool = this.tools.find(t => t.value === this.selectedTool)
+    if (currentTool) {
+      currentTool.defaultValue = this.zValue
+    }
+
+    // Yeni tool'a geç
+    this.selectedTool = toolValue
+    const newTool = this.tools.find(t => t.value === toolValue)
+    if (newTool) {
+      this.zValue = newTool.defaultValue
+      console.log(`Switched to ${newTool.text} with Z value: ${newTool.defaultValue}`)
+    }
+  }
 }
 </script>
 
-<style scoped>
-.v-btn {
-  min-width: 36px !important;
-}
-
-.mx-1 {
-  margin-left: 4px !important;
-  margin-right: 4px !important;
-}
-
-/* Dialog stilini özelleştirme */
-.v-dialog {
-  border-radius: 8px;
-  box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
-}
-
-.v-dialog > .v-card {
-  background-color: rgba(var(--v-theme-surface-rgb), 0.85) !important; /* Saydamlık eklendi */
-  backdrop-filter: blur(10px); /* Bulanık arka plan efekti */
-  -webkit-backdrop-filter: blur(10px); /* Safari için destek */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* İnce kenarlık */
-}
-
-.v-card-text {
-  backdrop-filter: blur(10px);
-}
-
-/* Butonları daha belirgin yapmak için */
-.v-btn {
-  background-color: rgba(var(--v-theme-surface-rgb), 0.9) !important;
-}
-
-/* Dialog açıldığında arka planı karartma */
-.v-overlay__scrim {
-  backdrop-filter: blur(5px);
-  background-color: rgba(0, 0, 0, 0.3) !important;
-}
-</style>

@@ -4,17 +4,26 @@
     icon="$fire"
     layout-path="dashboard.ze-manuel-card"
   >
-    <ze-manuel />
+    <v-row>
+      <v-col>
+        <ze-manuell />
+      </v-col>
+      <v-col>
+        <ze-manuel />
+      </v-col>
+    </v-row>
   </collapsable-card>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import ZeManuel from './ZeManuel.vue'
+import ZeManuell from './ZeManuell.vue'
 
 @Component({
   components: {
-    ZeManuel
+    ZeManuel,
+    ZeManuell
   }
 })
 export default class ZeManuelCard extends Vue {}

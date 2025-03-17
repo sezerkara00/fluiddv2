@@ -252,8 +252,8 @@ export default class Dashboard extends Mixins(StateMixin) {
     if (item.id === 'spoolman-card' && !this.supportsSpoolman) return true
     if (item.id === 'sensors-card' && !this.hasSensors) return true
     if (item.id === 'temperature-card' && !this.hasHeatersOrTemperatureSensors) return true
-    if (item.id === 'calibre-card') return true
-    if (item.id === 'ze-manuel-card') return true
+    if (item.id === 'Calibre-card') return true
+    if (item.id === 'Ze-manuel-card') return true
     // Otherwise return the opposite of whatever the enabled state is.
     return !item.enabled
   }

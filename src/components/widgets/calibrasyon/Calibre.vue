@@ -6,7 +6,7 @@
           <v-col cols="12" sm="6" md="3" class="mb-4 mb-sm-0 pa-0">
             <v-list-item-content>
               <v-list-item-title>
-                SELECT TOOL
+                SELECT TOOLs
               </v-list-item-title>
             </v-list-item-content>
           </v-col>
@@ -19,7 +19,7 @@
               item-text="text"
               item-value="value"
               label="Select Tool"
-              color="green"
+              color="lightgrey"
               outlined
               dark
               dense
@@ -117,6 +117,7 @@ export default class Calibre extends Mixins(StateMixin, BrowserMixin) {
     { text: 'Tool 2', value: 'tool2' },
     { text: 'Tool 3', value: 'tool3' },
     { text: 'Tool 4', value: 'tool4' },
+
   ]
 
   selectButton(index: number) {
@@ -133,7 +134,7 @@ export default class Calibre extends Mixins(StateMixin, BrowserMixin) {
   }
 
 
-  sendButton(index: number) {
+  sendButton (index: number) {
     console.log('Selected Tool:', this.selectedTool)
   }
 
@@ -152,14 +153,3 @@ export default class Calibre extends Mixins(StateMixin, BrowserMixin) {
 }
 </script>
 
-<style scoped>
-.tool-select {
-  background-color: transparent !important;
-}
-
-.box {
-  background-color: #f5f5f5;
-  padding: 10px;
-  border-radius: 4px;
-}
-</style>
