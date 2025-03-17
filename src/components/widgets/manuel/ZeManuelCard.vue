@@ -1,17 +1,13 @@
 <template>
   <collapsable-card
     :title="$t('app.general.title.z_manual')"
-    icon="$fire"
+    draggable
+    icon="$pidCalibrate"
     layout-path="dashboard.ze-manuel-card"
+
   >
-    <v-row>
-      <v-col>
-        <ze-manuell />
-      </v-col>
-      <v-col>
-        <ze-manuel />
-      </v-col>
-    </v-row>
+    <!-- <ze-manuell /> -->
+    <ze-manuel />
   </collapsable-card>
 </template>
 

@@ -80,7 +80,6 @@ declare module 'vue' {
     VBtnToggle: typeof import('vuetify/lib')['VBtnToggle']
     VCard: typeof import('vuetify/lib')['VCard']
     VCardActions: typeof import('vuetify/lib')['VCardActions']
-    VCardContainer: typeof import('vuetify/lib')['VCardContainer']
     VCardSubtitle: typeof import('vuetify/lib')['VCardSubtitle']
     VCardText: typeof import('vuetify/lib')['VCardText']
     VCardTitle: typeof import('vuetify/lib')['VCardTitle']

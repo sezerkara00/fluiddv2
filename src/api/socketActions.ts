@@ -5,7 +5,7 @@ import { consola } from 'consola'
 import type { TimelapseWritableSettings } from '@/store/timelapse/types'
 import type { WebcamConfig } from '@/store/webcams/types'
 
-const baseEmit = (method: string, options: NotifyOptions) => {
+export const baseEmit = (method: string, options: NotifyOptions) => {
   if (!Vue.$socket) {
     consola.warn('Socket emit denied, socket not ready.', method, options)
     return
@@ -456,7 +456,6 @@ export const SocketActions = {
   },
 
   async serverTemperatureStore () {
-    
     baseEmit(
       'server.temperature_store', {
         dispatch: 'charts/initTempStore',

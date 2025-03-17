@@ -49,7 +49,7 @@ import ToolheadCard from '@/components/widgets/toolhead/ToolheadCard.vue'
 import TemperatureCard from '@/components/widgets/thermals/TemperatureCard.vue'
 import CameraCard from '@/components/widgets/camera/CameraCard.vue'
 // import MacrosCard from '@/components/widgets/macros/MacrosCard.vue'
-// import ConsoleCard from '@/components/widgets/console/ConsoleCard.vue'
+import ConsoleCard from '@/components/widgets/console/ConsoleCard.vue'
 import OutputsCard from '@/components/widgets/outputs/OutputsCard.vue'
 // import PrinterLimitsCard from '@/components/widgets/limits/PrinterLimitsCard.vue'
 import RetractCard from '@/components/widgets/retract/RetractCard.vue'
@@ -78,7 +78,7 @@ import ZeManuelCard from '@/components/widgets/manuel/ZeManuelCard.vue'
     // PrinterLimitsCard,
     // PrinterSezerCard,
     RetractCard,
-    // ConsoleCard,
+    ConsoleCard,
     OutputsCard,
     BedMeshCard,
     GcodePreviewCard,
@@ -239,6 +239,7 @@ export default class Dashboard extends Mixins(StateMixin) {
   filtered (item: LayoutConfig) {
     // Take care of special cases.
     if (this.inLayout) return false
+    if (item.id === 'console-card' && !this.klippyReady) return true
     if (item.id === 'camera-card' && !this.hasCameras) return true
     if (item.id === 'macros-card' && !this.hasMacros) return true
     if (item.id === 'outputs-card' && !this.hasOutputs) return true

@@ -3,133 +3,177 @@
     <v-card-text>
       <v-container>
         <!-- Tool Selection and START button -->
-        <v-row align="center" justify="center" class="mb-4">
-          <!-- Tool Buttons -->
-          <v-col cols="auto">
+        <v-row align="center" justify="space-between">
+          <v-col cols="12" sm="6" md="3" class="mb-4 mb-sm-0 pa-0">
+            <v-list-item-content>
+              <v-list-item-title>
+                SELECT TOOL
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-col>
+          <v-col cols="12" sm="6" md="3" class="mb-4 mb-sm-0">
+            <v-select
+              v-model="selectedTool"
+              :items="tools"
+              item-text="text"
+              item-value="value"
+              label="Select Tool"
+              color="lightgrey"
+              outlined
+              dark
+              dense
+              hide-details="auto"
+            ></v-select>
+          </v-col>
+          <v-col cols="12" sm="6" md="3" class="mb-4 mb-sm-0 pa-0 text-center mr-4">
+            <v-btn
+              block
+              color="primary"
+              class="white--text"
+              x-large
+              @click="handleStart"
+              :disabled="!canExecuteCommand"
+            >
+              START Z MANUAL
+            </v-btn>
+          </v-col>
+        </v-row>
+          <!-- <v-col cols="auto" v-for="tool in tools" :key="tool.value">
             <v-btn
               color="primary"
               class="mx-1"
-              @click="selectTool('t0')"
+              @click="selectTool(tool.value)"
             >
-              T0
+              {{ tool.text }}
             </v-btn>
           </v-col>
           <v-col cols="auto">
             <v-btn
-              color="primary"
-              class="mx-1"
-              @click="selectTool('t1')"
-            >
-              T1
-            </v-btn>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              color="primary"
-              class="mx-1"
-              @click="selectTool('t2')"
-            >
-              T2
-            </v-btn>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              color="primary"
-              class="mx-1"
-              @click="selectTool('t3')"
-            >
-              T3
-            </v-btn>
-          </v-col>
-          
-          <!-- START Button -->
-          <v-col cols="auto">
-            <v-btn
-              color="grey"
+              color="success"
               class="mx-1"
               @click="handleStart"
             >
               START
             </v-btn>
-          </v-col>
-        </v-row>
+          </v-col> -->
+
 
         <!-- Z Control Dialog -->
         <v-dialog
           v-model="toolSelected"
           max-width="400"
           persistent
+
+        >
+        <collapsable-card
+          :title="selectedToolText"
         >
           <v-card>
             <v-card-text>
-              <!-- Tool Selection Buttons -->
-              <v-row justify="center" class="mb-4">
-                <v-col cols="auto" v-for="tool in tools" :key="tool.value">
-                  <v-btn
-                    small
-                    :color="selectedTool === tool.value ? 'primary' : 'grey darken-1'"
-                    class="mx-1"
-                    @click="switchTool(tool.value)"
-                  >
-                    {{ tool.text }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-
               <!-- Z Title with Value and Selected Tool -->
               <v-row justify="center" class="mb-4">
                 <v-col cols="12" class="text-center">
                   <span class="text-h5">
-                    {{ selectedToolText }} - Z [ {{ zValue.toFixed(3) }} ]
+                    {{ selectedToolText }}
                   </span>
+                  <div class="z-values mt-2">
+                    <div class="z-value-item">
+                      <span class="z-label">Target Z:</span>
+                      <v-text-field
+                        v-model.number="zValue"
+                        type="number"
+                        step="0.001"
+                        class="z-number"
+                        hide-details
+                        dense
+                      ></v-text-field>
+                    </div>
+                    <div class="z-value-item">
+                      <span class="z-label">Current Z:</span>
+                      <span class="z-number">{{ livePosition[2].toFixed(3) }}</span>
+                    </div>
+                  </div>
                 </v-col>
               </v-row>
 
-              <!-- Z Control Rows -->
-              <template v-for="(row, index) in zControlRows">
-                <v-row :key="index" align="center" justify="center" :class="index < 2 ? 'mb-2' : 'mb-6'">
-                  <v-col cols="auto">
-                    <v-btn  
-                      :color="getButtonColor(row.row, 'minus')" 
-                      x-small 
-                      @click="decrease(row.row)"
-                    >
-                      -
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="auto" class="text-center">
-                    <span class="mx-4">{{ row.row }}</span>
-                  </v-col>
-                  <v-col cols="auto">
-                    <v-btn 
-                      :color="getButtonColor(row.row, 'plus')" 
-                      x-small 
-                      @click="increase(row.row)"
-                    >
-                      +
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </template>
-
+              <!-- First Row of +/- Controls -->
+              <v-row v-for="(value, index) in changeZvalueList"
+                    :key="index"
+                    align="center"
+                    justify="center"
+                    :class="index !== changeZvalueList.length - 1 ? 'mb-2' : 'mb-6'">
+                <v-col cols="auto">
+                  <v-btn color="primary"
+                        @click="decrease(value)"
+                        :disabled="!canExecuteCommand">
+                    -
+                  </v-btn>
+                </v-col>
+                <v-col cols="auto" class="text-center bg-grey-lighten-1">
+                  <span class="mx-4 grey--text" color="grey">{{ value.toFixed(3) }}</span>
+                </v-col>
+                <v-col cols="auto">
+                  <v-btn color="primary"
+                        @click="increase(value)"
+                        :disabled="!canExecuteCommand">
+                    +
+                  </v-btn>
+                </v-col>
+              </v-row>
               <!-- Bottom Buttons -->
               <v-row justify="space-around" class="mt-4">
-                <v-col cols="auto" v-for="(btn, index) in bottomButtons" :key="index">
-                  <v-btn :color="btn.color" @click="handleButton(btn.action)">
-                    {{ btn.text }}
+                <v-col cols="auto">
+                  <v-btn color="primary"
+                        @click="handleButton(1)"
+                        :disabled="!canExecuteCommand">
+                    Abort
+                  </v-btn>
+                </v-col>
+                <v-col cols="auto">
+                  <v-btn color="primary"
+                        @click="handleButton(2)"
+                        :disabled="!canExecuteCommand">
+                    Offset
+                  </v-btn>
+                </v-col>
+                <v-col cols="auto">
+                  <v-btn color="primary"
+                        @click="handleButton(3)"
+                        :disabled="!canExecuteCommand"
+                        >
+
+                    Static
                   </v-btn>
                 </v-col>
               </v-row>
             </v-card-text>
           </v-card>
+        </collapsable-card>
         </v-dialog>
+
+        <div class="position-display">
+          <span class="axis-position">
+            X: {{ livePosition[0].toFixed(2) }}
+          </span>
+          <span class="axis-position">
+            Y: {{ livePosition[1].toFixed(2) }}
+          </span>
+          <span class="axis-position">
+            Z: {{ livePosition[2].toFixed(2) }}
+          </span>
+        </div>
       </v-container>
     </v-card-text>
   </v-card>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Mixins } from 'vue-property-decorator'
+import StateMixin from '@/mixins/state'
+import BrowserMixin from '@/mixins/browser'
+import type { KlipperPrinterSettings } from '@/store/printer/types'
+import ToolheadMixin from '@/mixins/toolhead'
+
 
 interface ToolValues {
   [key: string]: number
@@ -141,61 +185,46 @@ interface Tool {
   defaultValue: number
 }
 
-interface Button {
-  text: string
-  color: string
-  action: number
-}
-
 @Component({})
-export default class ZeManuel extends Vue {
-  toolSelected = false
-  selectedTool = ''
-  zValue = 10.000
+export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
+  private toolSelected = false
+  private selectedTool = ''
+  private zValue = 10.000
 
-  // Renk konfigürasyonu
-  buttonColors = {
-    minus: 'grey darken-1',
-    plus: 'grey darken-1',
-    default: 'primary',
-    active: 'primary'  // Butona basıldığında primary renk olacak
-  }
-
-  // Aktif buton takibi için
-  activeButton: { row: number; type: 'plus' | 'minus' } | null = null
-
-  // Z kontrol satırları konfigürasyonu
-  zControlRows = [
-    { row: 1, increment: 0.100, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
-    { row: 2, increment: 0.010, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
-    { row: 3, increment: 0.001, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
-    { row: 4, increment: 1, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
-    { row: 5, increment: 10, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } },
-    { row: 6, increment: 100, color: { minus: this.buttonColors.minus, plus: this.buttonColors.plus } }
-  ]
-
-  // Alt butonlar için konfigürasyon
-  bottomButtons: Button[] = [
-    { text: 'Abort', color: this.buttonColors.default, action: 1 },
-    { text: 'Offset', color: this.buttonColors.default, action: 2 },
-    { text: 'Static', color: this.buttonColors.default, action: 3 }
-  ]
-
-  tools: Tool[] = [
+  private tools: Tool[] = [
     { text: 'T0', value: 't0', defaultValue: 10.000 },
     { text: 'T1', value: 't1', defaultValue: 11.000 },
     { text: 'T2', value: 't2', defaultValue: 12.000 },
     { text: 'T3', value: 't3', defaultValue: 13.000 }
   ]
 
-  // Computed property to get selected tool text
-  get selectedToolText(): string {
+  changeZvalueList: number[] = [
+    1.000,
+    0.500,
+    0.100,
+    0.050,
+    0.025,
+    0.010
+  ]
+
+  get selectedToolText (): string {
     const tool = this.tools.find(t => t.value === this.selectedTool)
     return tool ? tool.text : ''
   }
+  get printerState (): 'printing' | 'paused' | 'cancelled' | 'ready' | 'busy' | 'idle' | 'loading' {
+    return this.$store.getters['printer/getPrinterState']
+  }
 
-  // Load saved values from localStorage when component is created
-  created() {
+  get canExecuteCommand(): boolean {
+    return ['ready', 'idle', 'paused'].includes(this.printerState)
+  }
+
+  emitSend (val: string): void {
+    this.$emit('send', val)
+    console.log(`komut gonderildi ${val}`)
+  }
+
+  created (): void {
     const savedValues = localStorage.getItem('toolZValues')
     if (savedValues) {
       const values = JSON.parse(savedValues) as ToolValues
@@ -206,93 +235,141 @@ export default class ZeManuel extends Vue {
     }
   }
 
-  handleStart() {
-    for (const tool of this.tools) {
-      console.log(tool.text, tool.defaultValue)
+  // setConsoleEntry(message: string): void {
+  //   const entry: ConsoleEntry = {
+  //     message,
+  //     time: Date.now(),
+  //     type: 'request'
+  //   }
+  //   this.$store.commit('console/setConsoleEntry', entry)
+  // }
+
+  get consoleEntries (): KlipperPrinterSettings {
+    return this.$store.getters['console/getConsoleEntries']
+  }
+
+  afterRoute(): string[] {
+    return ['G90\nG1 Y100 F7800', 'G90\nG1 X100 F7800', 'G90\nG1 Z5 F600']
+  }
+
+  private async sendGcodeAndWait(gcode: string): Promise<void> {
+    this.sendGcode(gcode)
+
+    return new Promise<void>((resolve) => {
+      const checkState = setInterval(() => {
+        if (this.canExecuteCommand) {
+          clearInterval(checkState)
+          resolve()
+        }
+      }, 100)
+    })
+  }
+  get livePosition (): [number, number, number, number] {
+    return this.$store.state.printer.printer.motion_report?.live_position ?? [0, 0, 0, 0]
+  }
+
+
+  async executeRouteCommands(): Promise<void> {
+    if (!this.canExecuteCommand) {
+      this.$emit('snackbar', {
+        message: 'Printer is not ready to execute commands',
+        type: 'warning'
+      })
+      return
+    }
+
+    const commands = this.afterRoute()
+
+    for (const command of commands) {
+      try {
+        await this.sendGcodeAndWait(command)
+      } catch (error) {
+        console.error('Error executing route command:', error)
+        this.$emit('snackbar', {
+          message: 'Error executing route commands',
+          type: 'error'
+        })
+        return
+      }
     }
   }
 
-  selectTool(toolValue: string) {
+  async handleStart(): Promise<void> {
+    const selectedToolInfo = this.tools.find(t => t.value === this.selectedTool)
+
+    if (selectedToolInfo) {
+      if (!this.canExecuteCommand) {
+        this.$emit('snackbar', {
+          message: 'Printer is not ready to execute commands',
+          type: 'error'
+        })
+        return
+      }
+
+      const message = selectedToolInfo.text
+      try {
+        await this.sendGcodeAndWait(message)
+        await this.executeRouteCommands()
+        this.toolSelected = true
+      } catch (error) {
+        console.error('Error in handleStart:', error)
+        this.$emit('snackbar', {
+          message: 'Error executing commands',
+          type: 'error'
+        })
+      }
+    } else {
+      console.warn('No tool selected')
+      this.$emit('snackbar', {
+        message: 'Please select a tool first',
+        type: 'warning'
+      })
+    }
+  }
+
+  selectTool (toolValue: string): void {
     this.selectedTool = toolValue
-    // Find the selected tool's default value
     const tool = this.tools.find(t => t.value === toolValue)
     if (tool) {
       this.zValue = tool.defaultValue
-      this.toolSelected = true // Immediately show Z control panel
+      this.toolSelected = true
       console.log(`Selected ${tool.text} with Z value: ${tool.defaultValue}`)
     }
   }
 
-  decrease(row: number) {
-    const rowConfig = this.zControlRows.find(r => r.row === row)
-    if (rowConfig) {
-      // Butonu aktif yap
-      this.activeButton = { row, type: 'minus' }
-      
-      // Değeri güncelle
-      this.zValue -= rowConfig.increment
-      this.zValue = Number(this.zValue.toFixed(3))
-
-      // 100ms sonra butonu normale döndür
-      setTimeout(() => {
-        this.activeButton = null
-      }, 100)
-    }
+  decrease (value: number): void {
+    this.zValue -= value
+    this.zValue = Number(this.zValue.toFixed(3))
   }
 
-  increase(row: number) {
-    const rowConfig = this.zControlRows.find(r => r.row === row)
-    if (rowConfig) {
-      // Butonu aktif yap
-      this.activeButton = { row, type: 'plus' }
-      
-      // Değeri güncelle
-      this.zValue += rowConfig.increment
-      this.zValue = Number(this.zValue.toFixed(3))
-
-      // 100ms sonra butonu normale döndür
-      setTimeout(() => {
-        this.activeButton = null
-      }, 100)
-    }
+  increase (value: number): void {
+    this.zValue += value
+    this.zValue = Number(this.zValue.toFixed(3))
   }
 
-  // Buton rengini hesaplamak için computed method
-  getButtonColor(row: number, type: 'plus' | 'minus'): string {
-    if (this.activeButton && this.activeButton.row === row && this.activeButton.type === type) {
-      return this.buttonColors.active
-    }
-    return type === 'plus' ? this.buttonColors.plus : this.buttonColors.minus
-  }
-
-  handleButton(buttonNumber: number) {
-    if (buttonNumber === 1) { // Abort
+  handleButton (buttonNumber: number): void {
+    if (buttonNumber === 1) {
       this.toolSelected = false
       this.selectedTool = ''
       console.log('Aborted - returning to tool selection')
-    } else if (buttonNumber === 3) { // Static
-      // Save current Z value for the selected tool
+    } else if (buttonNumber === 3) {
       const toolIndex = this.tools.findIndex(t => t.value === this.selectedTool)
       if (toolIndex !== -1) {
-        // Update the tool's default value
         this.tools[toolIndex].defaultValue = this.zValue
 
-        // Save all tool values to localStorage
-        const values = this.tools.reduce((acc, tool) => {
+        const values = this.tools.reduce((acc: ToolValues, tool) => {
           acc[tool.value] = tool.defaultValue
           return acc
         }, {} as ToolValues)
 
         localStorage.setItem('toolZValues', JSON.stringify(values))
 
-        // Log the saved values
         console.log('Static button pressed - Saved values:', {
           tool: this.tools[toolIndex].text,
           zValue: this.zValue.toFixed(3),
           allValues: values
         })
 
-        // Show success message
         this.$emit('snackbar', {
           message: `Saved Z value ${this.zValue.toFixed(3)} for ${this.tools[toolIndex].text}`,
           type: 'success'
@@ -301,21 +378,76 @@ export default class ZeManuel extends Vue {
     }
   }
 
-  switchTool(toolValue: string) {
-    // Mevcut Z değerini kaydet
-    const currentTool = this.tools.find(t => t.value === this.selectedTool)
-    if (currentTool) {
-      currentTool.defaultValue = this.zValue
+  async routeY(): Promise<void> {
+    if (this.canExecuteCommand) {
+      this.sendGcode('G90\nG1 Y100 F7800')
+    } else {
+      this.$emit('snackbar', {
+        message: 'Printer is not ready to execute commands',
+        type: 'warning'
+      })
     }
+  }
 
-    // Yeni tool'a geç
-    this.selectedTool = toolValue
-    const newTool = this.tools.find(t => t.value === toolValue)
-    if (newTool) {
-      this.zValue = newTool.defaultValue
-      console.log(`Switched to ${newTool.text} with Z value: ${newTool.defaultValue}`)
+  async routeX(): Promise<void> {
+    if (this.canExecuteCommand) {
+      this.sendGcode('G90\nG1 X100 F7800')
+    } else {
+      this.$emit('snackbar', {
+        message: 'Printer is not ready to execute commands',
+        type: 'warning'
+      })
+    }
+  }
+
+  async routeZ(): Promise<void> {
+    if (this.canExecuteCommand) {
+      this.sendGcode('G90\nG1 Z5 F600')
+    } else {
+      this.$emit('snackbar', {
+        message: 'Printer is not ready to execute commands',
+        type: 'warning'
+      })
     }
   }
 }
 </script>
 
+<style scoped>
+.position-display {
+  display: flex;
+  gap: 1rem;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.axis-position {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.z-values {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.z-value-item {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.z-label {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.z-number {
+  font-family: monospace;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+</style>

@@ -6,7 +6,7 @@
           <v-col cols="12" sm="6" md="3" class="mb-4 mb-sm-0 pa-0">
             <v-list-item-content>
               <v-list-item-title>
-                SELECT TOOLs
+                SELECT TOOL
               </v-list-item-title>
             </v-list-item-content>
           </v-col>
@@ -132,6 +132,7 @@ export default class Calibre extends Mixins(StateMixin, BrowserMixin) {
   pressSend(pressed: boolean) {
     this.isSendPressed = pressed
   }
+
 
 
   sendButton (index: number) {
