@@ -14,12 +14,12 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import ZeManuel from './ZeManuel.vue'
-import ZeManuell from './ZeManuell.vue'
+// import ZeManuell from './ZeManuell.vue'
 
 @Component({
   components: {
-    ZeManuel,
-    ZeManuell
+    ZeManuel
+    // ZeManuell
   }
 })
 export default class ZeManuelCard extends Vue {}

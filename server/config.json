@@ -9,7 +9,7 @@
   "themePresets": [
     {
       "name": "Layerstec/M1pro",
-      "color": "#252525",
+      "color": "#e35500",
       "isDark": true,
       "logo": {
         "src": "logo_sezer.svg"

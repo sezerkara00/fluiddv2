@@ -37,7 +37,7 @@ export default class AppSettingsNav extends Vue {
       { name: this.$t('app.setting.title.general'), hash: '#general', visible: true },
       { name: this.$t('app.setting.title.theme'), hash: '#theme', visible: true },
       { name: this.$t('app.setting.title.authentication'), hash: '#auth', visible: true },
-      { name: this.$t('app.setting.title.console'), hash: '#console', visible: true },
+      // { name: this.$t('app.setting.title.console'), hash: '#console', visible: true },
       { name: this.$t('app.setting.title.file_browser'), hash: '#browser', visible: true },
       { name: this.$t('app.setting.title.file_editor'), hash: '#editor', visible: true },
       // { name: this.$t('app.setting.title.macros'), hash: '#macros', visible: true },
@@ -47,7 +47,7 @@ export default class AppSettingsNav extends Vue {
       { name: this.$t('app.setting.title.gcode_preview'), hash: '#gcodePreview', visible: true },
       { name: this.$t('app.general.title.timelapse'), hash: '#timelapse', visible: this.supportsTimelapse },
       { name: this.$t('app.spoolman.title.spoolman'), hash: '#spoolman', visible: this.supportsSpoolman },
-      { name: this.$t('app.version.title'), hash: '#versions', visible: this.supportsVersions }
+      // { name: this.$t('app.version.title'), hash: '#versions', visible: this.supportsVersions }
     ]
   }
 

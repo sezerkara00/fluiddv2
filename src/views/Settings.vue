@@ -12,7 +12,7 @@
         <general-settings />
         <theme-settings />
         <auth-settings v-if="supportsAuth" />
-        <console-settings />
+        <!-- <console-settings /> -->
         <file-browser-settings />
         <file-editor-settings />
         <!-- <macro-settings /> -->
@@ -22,7 +22,7 @@
         <gcode-preview-settings />
         <timelapse-settings v-if="supportsTimelapse" />
         <spoolman-settings v-if="supportsSpoolman" />
-        <version-settings v-if="supportsVersions" />
+        <!-- <version-settings v-if="supportsVersions" /> -->
       </div>
     </v-col>
   </v-row>
@@ -41,7 +41,7 @@ import ThemeSettings from '@/components/settings/ThemeSettings.vue'
 import VersionSettings from '@/components/settings/VersionSettings.vue'
 import GcodePreviewSettings from '@/components/settings/GcodePreviewSettings.vue'
 import AuthSettings from '@/components/settings/auth/AuthSettings.vue'
-import ConsoleSettings from '@/components/settings/console/ConsoleSettings.vue'
+// import ConsoleSettings from '@/components/settings/console/ConsoleSettings.vue'
 import FileBrowserSettings from '@/components/settings/FileBrowserSettings.vue'
 import FileEditorSettings from '@/components/settings/FileEditorSettings.vue'
 import TimelapseSettings from '@/components/settings/timelapse/TimelapseSettings.vue'
@@ -60,7 +60,7 @@ import SpoolmanSettings from '@/components/settings/SpoolmanSettings.vue'
     VersionSettings,
     GcodePreviewSettings,
     AuthSettings,
-    ConsoleSettings,
+    // ConsoleSettings,
     FileBrowserSettings,
     FileEditorSettings
   }

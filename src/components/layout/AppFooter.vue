@@ -8,7 +8,7 @@
   >
     <span class="secondary--text">
       &copy; {{ new Date().getFullYear() }}
-      fluidd: v{{ version }}-{{ hash }}
+      Layerstec: v{{ version }}-{{ hash }}
     </span>
   </v-footer>
 </template>

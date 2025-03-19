@@ -36,7 +36,7 @@
     </v-col>
     <v-col cols="6">
       <v-row
-        justify="space-between"
+        justify="center"
         no-gutters
         class="mr-n1"
       >
@@ -72,7 +72,7 @@
             </v-icon>
           </app-btn>
         </v-col>
-        <v-col
+        <!-- <v-col
           cols="4"
           class="pr-1"
         >
@@ -86,9 +86,9 @@
             <v-icon small>
               $save
             </v-icon>
-          </app-btn>
+          </app-btn> -->
 
-          <v-menu
+          <!-- <v-menu
             v-else
             left
             offset-y
@@ -133,8 +133,8 @@
                 </v-list-item>
               </template>
             </v-list>
-          </v-menu>
-        </v-col>
+          </v-menu> -->
+        <!-- </v-col> -->
       </v-row>
     </v-col>
   </v-row>

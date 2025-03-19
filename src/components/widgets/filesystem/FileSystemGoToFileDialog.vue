@@ -65,6 +65,7 @@ export default class FileSystemGoToFileDialog extends Mixins(StateMixin) {
   search = ''
   loaded = false
 
+  // sadece gcode dosyalari geliyor
   get rootFiles (): MoonrakerRootFile[] {
     return this.$store.getters['files/getRootFiles'](this.root)
   }

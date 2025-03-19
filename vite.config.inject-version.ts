@@ -17,8 +17,8 @@ const writeReleaseInfoFile = async () => {
   const releaseInfoFile = await fs.promises.open(path.resolve(__dirname, 'dist/release_info.json'), 'w')
 
   await releaseInfoFile.writeFile(JSON.stringify({
-    project_name: 'fluidd',
-    project_owner: 'fluidd-core',
+    project_name: 'Layerstec',
+    project_owner: 'Layerstec',
     version: `v${version}`
   }))
 

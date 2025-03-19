@@ -80,17 +80,21 @@
           </v-col> -->
 
           <!-- Sağ Buton -->
-          <v-col cols="12" sm="6" md="3" class="mb-4 mb-sm-0 pa-0 text-center mr-4">
+          <v-col cols="12" sm="6" md="3" class="mb-4 mb-sm-0 pa-0 text-center mr-10">
             <v-btn
               block
-              :color="isSendPressed ? 'primary' : 'dark'"
+              color="primary"
               class="white--text"
               x-large
-              @mousedown="pressSend(true)"
-              @mouseup="pressSend(false)"
-              @mouseleave="pressSend(false)"
+              :disabled="!canExecuteCommand || !allHomed"
               @click="sendButton(selectedButton)"
             >
+              <template v-if="!isLoading" class="mr-4">
+                <v-icon>$cogs</v-icon>
+              </template>
+              <template v-if="isLoading">
+                <v-progress-circular indeterminate color="white" size="24" class="mr-4" />
+              </template>
               START CALIBRATION
             </v-btn>
           </v-col>
@@ -101,26 +105,32 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
-import StateMixin from '@/mixins/state';
-import BrowserMixin from '@/mixins/browser';
-import type { KlipperPrinterSettings } from '@/store/printer/types';
+import { Component, Mixins } from 'vue-property-decorator'
+import StateMixin from '@/mixins/state'
+import BrowserMixin from '@/mixins/browser'
+import type { KlipperPrinterSettings } from '@/store/printer/types'
 
 @Component({})
 export default class Calibre extends Mixins(StateMixin, BrowserMixin) {
+  isLoading: boolean = false
   selectedButton: number = -1 // -1 means no button selected
-  selectedTool: string = 'select tool' // default selected tool
+  selectedTool = { text: 'Select Tool', value: '' } // default selected tool
   isSendPressed: boolean = false // track send button press state
   // Tool options for the combobox
   tools = [
-    { text: 'Tool 1', value: 'tool1' },
-    { text: 'Tool 2', value: 'tool2' },
-    { text: 'Tool 3', value: 'tool3' },
-    { text: 'Tool 4', value: 'tool4' },
+    { text: 'Probs', value: 'z' },
+    { text: 'Tool 0', value: '0' },
+    { text: 'Tool 1', value: '1' },
+    { text: 'Tool 2', value: '2' },
+    { text: 'Tool 3', value: '3' },
 
   ]
 
-  selectButton(index: number) {
+  get allHomed (): boolean {
+    return this.$store.getters['printer/getHomedAxes']('xyz')
+  }
+
+  selectButton (index: number) {
     // If clicking the already selected button, deselect it
     if (this.selectedButton === index) {
       this.selectedButton = -1
@@ -129,28 +139,21 @@ export default class Calibre extends Mixins(StateMixin, BrowserMixin) {
     }
   }
 
-  pressSend(pressed: boolean) {
+  pressSend (pressed: boolean) {
     this.isSendPressed = pressed
   }
 
-
-
   sendButton (index: number) {
-    console.log('Selected Tool:', this.selectedTool)
+    this.isLoading = true
+    this.sendGcode(`Z_SWITCH_CALIBRATION T=${this.selectedTool}`)
   }
 
-  get consoleEntries (): KlipperPrinterSettings {
-    return this.$store.getters['console/getConsoleEntries'];
-  }
+  get canExecuteCommand (): boolean {
+    if (this.printerState === 'ready' || this.printerState === 'paused') {
+      this.isLoading = false
+    }
+    return ['ready', 'paused'].includes(this.printerState)
 
-  get latestConsoleMessage () {
-    const lastEntry = this.consoleEntries[this.consoleEntries.length - 1];
-    return lastEntry ? `Son Mesaj: ${lastEntry.message}` : 'Mesaj yok';
-  }
-
-  get heaters () {
-    return this.$store.getters['printer/getHeaters'];
   }
 }
 </script>
-

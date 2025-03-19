@@ -34,36 +34,22 @@
               @click="handleStart"
               :disabled="!canExecuteCommand"
             >
+              <template v-if="!isLoading" class="mr-4">
+                <v-icon>$cogs</v-icon>
+              </template>
+              <template v-if="isLoading">
+                <v-progress-circular indeterminate color="white" size="24" class="mr-4" />
+              </template>
               START Z MANUAL
             </v-btn>
           </v-col>
         </v-row>
-          <!-- <v-col cols="auto" v-for="tool in tools" :key="tool.value">
-            <v-btn
-              color="primary"
-              class="mx-1"
-              @click="selectTool(tool.value)"
-            >
-              {{ tool.text }}
-            </v-btn>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              color="success"
-              class="mx-1"
-              @click="handleStart"
-            >
-              START
-            </v-btn>
-          </v-col> -->
-
 
         <!-- Z Control Dialog -->
         <v-dialog
           v-model="toolSelected"
           max-width="400"
           persistent
-
         >
         <collapsable-card
           :title="selectedToolText"
@@ -76,8 +62,8 @@
                   <span class="text-h5">
                     {{ selectedToolText }}
                   </span>
-                  <div class="z-values mt-2">
-                    <div class="z-value-item">
+                  <!-- <div class="z-values mt-2"> -->
+                    <!-- <div class="z-value-item">
                       <span class="z-label">Target Z:</span>
                       <v-text-field
                         v-model.number="zValue"
@@ -86,8 +72,9 @@
                         class="z-number"
                         hide-details
                         dense
+
                       ></v-text-field>
-                    </div>
+                    </div> -->
                     <div class="z-value-item">
                       <span class="z-label">Current Z:</span>
                       <span class="z-number">{{ livePosition[2].toFixed(3) }}</span>
@@ -131,16 +118,15 @@
                 </v-col>
                 <v-col cols="auto">
                   <v-btn color="primary"
-                        @click="handleButton(2)"
+                        @click="OffsetDialog = true"
                         :disabled="!canExecuteCommand">
                     Offset
                   </v-btn>
                 </v-col>
                 <v-col cols="auto">
                   <v-btn color="primary"
-                        @click="handleButton(3)"
-                        :disabled="!canExecuteCommand"
-                        >
+                        @click="StaticSaveDialog = true"
+                        :disabled="!canExecuteCommand">
 
                     Static
                   </v-btn>
@@ -151,6 +137,83 @@
         </collapsable-card>
         </v-dialog>
 
+        <v-dialog v-model="StaticSaveDialog" max-width="400" persistent>
+          <collapsable-card>
+            <template #title>
+              <div class="d-flex align-center">
+                <v-icon>$error</v-icon>
+                <span>Confirmation</span>
+              </div>
+            </template>
+            <v-card>
+              <v-card-text>
+                <v-row justify="center" class="mb-4">
+                  <v-col cols="12" class="text-center">
+                    <span class="text-h5">
+                      Are you sure {{ toolName }} SAVE STATIC ?
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row justify="center" class="mt-4">
+                  <v-col cols="auto" class="mx-2">
+                    <v-btn
+                      @click="StaticSaveDialog = false"
+                    >
+                      No
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="auto" class="mx-2">
+                    <v-btn
+                      color="primary"
+                      @click="StaticSaveDialogPage"
+                    >
+                      Yes
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </collapsable-card>
+        </v-dialog>
+
+        <v-dialog v-model="OffsetDialog" max-width="400" persistent>
+          <collapsable-card>
+            <template #title>
+              <div class="d-flex align-center">
+                <v-icon>$error</v-icon>
+                <span>Confirmation</span>
+              </div>
+            </template>
+            <v-card>
+              <v-card-text>
+                <v-row justify="center" class="mb-4">
+                  <v-col cols="12" class="text-center">
+                    <span class="text-h5">
+                      Are you sure {{ toolName }} SAVE OFFSET ?
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row justify="center" class="mt-4">
+                  <v-col cols="auto" class="mx-2">
+                    <v-btn
+                      @click="OffsetDialog = false"
+                    >
+                      No
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="auto" class="mx-2">
+                    <v-btn
+                      color="primary"
+                      @click="OffsetDialogPage"
+                    >
+                      Yes
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </collapsable-card>
+        </v-dialog>
         <div class="position-display">
           <span class="axis-position">
             X: {{ livePosition[0].toFixed(2) }}
@@ -172,7 +235,6 @@ import { Component, Mixins } from 'vue-property-decorator'
 import StateMixin from '@/mixins/state'
 import BrowserMixin from '@/mixins/browser'
 import type { KlipperPrinterSettings } from '@/store/printer/types'
-import ToolheadMixin from '@/mixins/toolhead'
 
 
 interface ToolValues {
@@ -187,16 +249,42 @@ interface Tool {
 
 @Component({})
 export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
+  isLoading: boolean = false
   private toolSelected = false
   private selectedTool = ''
   private zValue = 10.000
-
+  private StaticSaveDialog = false
+  private OffsetDialog = false
   private tools: Tool[] = [
-    { text: 'T0', value: 't0', defaultValue: 10.000 },
-    { text: 'T1', value: 't1', defaultValue: 11.000 },
-    { text: 'T2', value: 't2', defaultValue: 12.000 },
-    { text: 'T3', value: 't3', defaultValue: 13.000 }
+    { text: 'T0', value: '0', defaultValue: 10.000 },
+    { text: 'T1', value: '1', defaultValue: 11.000 },
+    { text: 'T2', value: '2', defaultValue: 12.000 },
+    { text: 'T3', value: '3', defaultValue: 13.000 }
   ]
+
+  get toolHaveValue (): boolean {
+    return this.tools.some(tool => tool.value === this.selectedTool)
+  }
+
+  get toolName (): string {
+    return this.tools.find(t => t.value === this.selectedTool)?.text ?? ''
+  }
+
+  StaticSaveDialogPage (): void {
+    this.StaticSaveDialog = false
+    const selectedToolInfo = this.tools.find(t => t.value === this.selectedTool)
+    if (selectedToolInfo) {
+      this.sendGcode(`SAVE_Z_NOZZLE_TEST T=${selectedToolInfo.value} TYPE=STATIC`)
+    }
+  }
+
+  OffsetDialogPage (): void {
+    this.OffsetDialog = false
+    const selectedToolInfo = this.tools.find(t => t.value === this.selectedTool)
+    if (selectedToolInfo) {
+      this.sendGcode(`SAVE_Z_NOZZLE_TEST T=${selectedToolInfo.value} TYPE=OFFSET`)
+    }
+  }
 
   changeZvalueList: number[] = [
     1.000,
@@ -211,12 +299,19 @@ export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
     const tool = this.tools.find(t => t.value === this.selectedTool)
     return tool ? tool.text : ''
   }
-  get printerState (): 'printing' | 'paused' | 'cancelled' | 'ready' | 'busy' | 'idle' | 'loading' {
-    return this.$store.getters['printer/getPrinterState']
+  // get printerState (): 'printing' | 'paused' | 'cancelled' | 'ready' | 'busy' | 'idle' | 'loading' {
+  //   return this.$store.getters['printer/getPrinterState']
+  // }
+
+  get canExecuteCommand (): boolean {
+    if (this.printerState === 'ready' || this.printerState === 'paused') {
+      this.isLoading = false
+    }
+    return ['ready', 'paused'].includes(this.printerState)
   }
 
-  get canExecuteCommand(): boolean {
-    return ['ready', 'idle', 'paused'].includes(this.printerState)
+  get allHomed (): boolean {
+    return this.$store.getters['printer/getHomedAxes']('xyz')
   }
 
   emitSend (val: string): void {
@@ -248,8 +343,9 @@ export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
     return this.$store.getters['console/getConsoleEntries']
   }
 
-  afterRoute(): string[] {
-    return ['G90\nG1 Y100 F7800', 'G90\nG1 X100 F7800', 'G90\nG1 Z5 F600']
+  afterRoute (): string[] {
+    return ['G90\nG1 Z25 F600', 'G90\nG1 X100 F7800', 'G90\nG1 Y100 F7800']
+    // return ['G90\nG1 Y100 F7800', 'G90\nG1 X100 F7800', 'G90\nG1 Z5 F600']
   }
 
   private async sendGcodeAndWait(gcode: string): Promise<void> {
@@ -264,10 +360,10 @@ export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
       }, 100)
     })
   }
+
   get livePosition (): [number, number, number, number] {
     return this.$store.state.printer.printer.motion_report?.live_position ?? [0, 0, 0, 0]
   }
-
 
   async executeRouteCommands(): Promise<void> {
     if (!this.canExecuteCommand) {
@@ -294,9 +390,9 @@ export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
     }
   }
 
-  async handleStart(): Promise<void> {
+  async handleStart (): Promise<void> {
+    this.isLoading = true
     const selectedToolInfo = this.tools.find(t => t.value === this.selectedTool)
-
     if (selectedToolInfo) {
       if (!this.canExecuteCommand) {
         this.$emit('snackbar', {
@@ -305,12 +401,14 @@ export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
         })
         return
       }
-
-      const message = selectedToolInfo.text
+      const message = `Z_NOZZLE_TEST T=${selectedToolInfo.value}`
       try {
         await this.sendGcodeAndWait(message)
-        await this.executeRouteCommands()
-        this.toolSelected = true
+        console.log('message gonderildi: ', message)
+        if (this.printerState === 'ready') {
+          await this.executeRouteCommands()
+          this.toolSelected = true
+        }
       } catch (error) {
         console.error('Error in handleStart:', error)
         this.$emit('snackbar', {
@@ -333,18 +431,19 @@ export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
     if (tool) {
       this.zValue = tool.defaultValue
       this.toolSelected = true
-      console.log(`Selected ${tool.text} with Z value: ${tool.defaultValue}`)
     }
   }
 
   decrease (value: number): void {
     this.zValue -= value
     this.zValue = Number(this.zValue.toFixed(3))
+    this.sendGcode(`G90\nG1 Z${this.zValue} F600`)
   }
 
   increase (value: number): void {
     this.zValue += value
     this.zValue = Number(this.zValue.toFixed(3))
+    this.sendGcode(`G90\nG1 Z${this.zValue} F600`)
   }
 
   handleButton (buttonNumber: number): void {
@@ -357,57 +456,21 @@ export default class ZeManuel extends Mixins(StateMixin, BrowserMixin) {
       if (toolIndex !== -1) {
         this.tools[toolIndex].defaultValue = this.zValue
 
-        const values = this.tools.reduce((acc: ToolValues, tool) => {
-          acc[tool.value] = tool.defaultValue
-          return acc
-        }, {} as ToolValues)
+        this.sendGcode(`SAVE_Z_NOZZLE_TEST T=${this.selectedTool} TYPE=STATIC`)
 
-        localStorage.setItem('toolZValues', JSON.stringify(values))
+      //   localStorage.setItem('toolZValues', JSON.stringify(values))
 
-        console.log('Static button pressed - Saved values:', {
-          tool: this.tools[toolIndex].text,
-          zValue: this.zValue.toFixed(3),
-          allValues: values
-        })
+      //   console.log('Static button pressed - Saved values:', {
+      //     tool: this.tools[toolIndex].text,
+      //     zValue: this.zValue.toFixed(3),
+      //     allValues: values
+      //   })
 
         this.$emit('snackbar', {
           message: `Saved Z value ${this.zValue.toFixed(3)} for ${this.tools[toolIndex].text}`,
           type: 'success'
         })
       }
-    }
-  }
-
-  async routeY(): Promise<void> {
-    if (this.canExecuteCommand) {
-      this.sendGcode('G90\nG1 Y100 F7800')
-    } else {
-      this.$emit('snackbar', {
-        message: 'Printer is not ready to execute commands',
-        type: 'warning'
-      })
-    }
-  }
-
-  async routeX(): Promise<void> {
-    if (this.canExecuteCommand) {
-      this.sendGcode('G90\nG1 X100 F7800')
-    } else {
-      this.$emit('snackbar', {
-        message: 'Printer is not ready to execute commands',
-        type: 'warning'
-      })
-    }
-  }
-
-  async routeZ(): Promise<void> {
-    if (this.canExecuteCommand) {
-      this.sendGcode('G90\nG1 Z5 F600')
-    } else {
-      this.$emit('snackbar', {
-        message: 'Printer is not ready to execute commands',
-        type: 'warning'
-      })
     }
   }
 }
