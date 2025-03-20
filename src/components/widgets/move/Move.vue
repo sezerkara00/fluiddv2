@@ -107,9 +107,9 @@
           <!-- X, Y, Z pozisyonları ve inputları sağ üst köşede -->
           <v-row>
             <v-col cols="auto" class="d-flex flex-column" style="gap: 11px;">
-              <div class="d-flex justify-space-between">
-                <v-btn>RETRACT<v-icon>$absolutePositioning</v-icon> </v-btn>
-                <v-btn>EXTRUDE<v-icon>$chevronDown</v-icon> </v-btn>
+              <div class="d-flex justify-space-between" style="gap: 4px;">
+                <v-btn><v-icon>$absolutePositioning</v-icon> </v-btn>
+                <v-btn><v-icon>$relativePositioning</v-icon> </v-btn>
               </div>
               <v-btn>RETRACT <v-icon>$chevronUp</v-icon> </v-btn>
 
