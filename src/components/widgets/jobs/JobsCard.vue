@@ -10,15 +10,15 @@
     <template #menu>
       <app-btn
         class="mr-2"
-        :color="activeButton === 'custom' ? 'primary' : 'default'"
-        @click="navigateToCustomFolder"
+        :color="testButton ? 'primary' : 'default'"
+        @click="test"
       >
-        Özel Klasör
+        Test
       </app-btn>
 
       <app-btn
         class="mr-2"
-        :color="activeButton === 'gcodes' ? 'primary' : 'default'"
+        :color="!testButton ? 'primary' : 'default'"
         @click="handleGcodes"
       >
         gcodes
@@ -30,6 +30,7 @@
       :roots="['gcodes']"
       name="dashboard"
       dense
+      :allow-parent-directory="!isInTestFolder"
       class="partial-screen"
     />
   </collapsable-card>
@@ -46,39 +47,32 @@ import { nextTick } from 'vue'
   }
 })
 export default class JobsCard extends Vue {
-  activeButton = 'gcodes'
-  customFolderPath = 'gcodes/fluiddv2' // Burada istediğiniz özel klasör yolunu belirtin
+  testButton = false
+  defaultButton = true
+  isInTestFolder = false
 
   @Prop({ type: Boolean })
   readonly fullscreen?: boolean
 
-  navigateToCustomFolder() {
-    this.activeButton = 'custom'
+  test () {
+    this.testButton = true
+    this.defaultButton = false
+    this.isInTestFolder = true
     const fileSystem = this.$refs.fileSystem as FileSystem
-
-    // Önce ana gcodes dizinine git, sonra alt klasöre geçmeyi dene
-    fileSystem.loadFiles('gcodes')
-
-    // Bir sonraki çerçevede alt klasöre gitmeyi dene
+    fileSystem.currentPath = 'gcodes/test_gcodes'
     nextTick(() => {
-      try {
-        // Alt klasöre gitmeyi dene
-        if (fileSystem && this.customFolderPath) {
-          fileSystem.currentPath = this.customFolderPath
-          fileSystem.loadFiles(this.customFolderPath)
-        }
-      } catch (error) {
-        console.error('Özel klasöre erişim hatası:', error)
-        // Hata durumunda ana gcodes klasöründe kal
+      if (fileSystem) {
+        fileSystem.loadFiles(fileSystem.currentPath)
       }
     })
   }
 
-  handleGcodes() {
-    this.activeButton = 'gcodes'
+  handleGcodes () {
+    this.testButton = false
+    this.defaultButton = true
+    this.isInTestFolder = false
     const fileSystem = this.$refs.fileSystem as FileSystem
     if (fileSystem) {
-      fileSystem.currentPath = 'gcodes'
       fileSystem.loadFiles('gcodes')
     }
   }

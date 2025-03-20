@@ -100,7 +100,7 @@
           @click="$emit('remove', selected)"
         >
           <v-icon>
-            $delete
+            $deletess
           </v-icon>
         </app-btn>
       </template>

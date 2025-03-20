@@ -188,6 +188,9 @@ export default class FileSystem extends Mixins(StateMixin, FilesMixin, ServicesM
   @Prop({ type: Boolean })
   readonly bulkActions?: boolean
 
+  @Prop({ type: Boolean, default: true })
+  readonly allowParentDirectory!: boolean
+
   // Maintains the path and root.
   currentRoot = ''
 
@@ -511,6 +514,10 @@ export default class FileSystem extends Mixins(StateMixin, FilesMixin, ServicesM
 
   // Returns the current path with no root.
   get visiblePath (): string {
+    if (this.currentPath === 'config/gcodes/test_gcodes') {
+      return 'test_gcodes'
+    }
+
     if (
       this.currentPath &&
       this.currentPath.startsWith(this.currentRoot)
@@ -576,7 +583,22 @@ export default class FileSystem extends Mixins(StateMixin, FilesMixin, ServicesM
   getAllFiles () {
     const items: FileBrowserEntry[] | undefined = this.$store.getters['files/getDirectory'](this.currentPath)
 
-    return items ?? []
+    if (!items) return []
+
+    // Filter out parent directory entry if not allowed
+    const filteredItems = this.allowParentDirectory
+      ? items
+      : items.filter(item => !(item.type === 'directory' && item.dirname === '..'))
+
+    // Hide fluiddv2 directory in gcodes root
+    return filteredItems.filter(item => {
+      if (this.currentPath === 'gcodes' &&
+          item.type === 'directory' &&
+          item.dirname === 'test_gcodes') {
+        return false
+      }
+      return true
+    })
   }
 
   @Watch('files')

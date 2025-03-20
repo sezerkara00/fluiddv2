@@ -66,6 +66,8 @@ import type { KlipperPrinterSettings } from '@/store/printer/types'
 import PrinterLimitCard from '@/components/widgets/denemee/PrinterLimitCard.vue'
 import CalibreCard from '@/components/widgets/calibrasyon/CalibreCard.vue'
 import ZeManuelCard from '@/components/widgets/manuel/ZeManuelCard.vue'
+import MoveCard from '@/components/widgets/move/MoveCard.vue'
+
 @Component({
   components: {
     PrinterStatusCard,
@@ -88,7 +90,8 @@ import ZeManuelCard from '@/components/widgets/manuel/ZeManuelCard.vue'
     RunoutSensorsCard,
     BeaconCard,
     CalibreCard,
-    ZeManuelCard
+    ZeManuelCard,
+    MoveCard
   }
 })
 export default class Dashboard extends Mixins(StateMixin) {

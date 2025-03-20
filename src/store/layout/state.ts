@@ -25,6 +25,7 @@ export const defaultState = (): LayoutState => {
           { id: 'retract-card', enabled: true, collapsed: false },
           { id: 'calibre-card', enabled: true, collapsed: false },
           { id: 'ze-manuel-card', enabled: true, collapsed: false },
+          { id: 'move-card', enabled: true, collapsed: false }
         ],
         container2: [
           { id: 'temperature-card', enabled: true, collapsed: false },
